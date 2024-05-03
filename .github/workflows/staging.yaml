@@ -18,7 +18,12 @@ jobs:
       # Isntalling SFDX CLI
       - name: Install the SFDX CLI
         run: |
-          npm install @salesforce/cli --global
+          npm install sfdx-cli --global
+          sfdx force --help
+
+      - name: Install the sfdx-git-delta plugin
+        run: |
+          echo 'y' | sfdx plugins:install sfdx-git-delta
 
       # We need to use a key value stored as GitHub secret and
       # create a .key file since 'sf org login jwt' command expects a path
@@ -35,9 +40,14 @@ jobs:
           --username "${{ secrets.SF_CICD_USERNAME }}"
           --jwt-key-file server.key
           --client-id ${{ secrets.SF_CLIENT_SECRET }}
-      # Pushing sourche to Scratch org
-      - name: Push source to Scratch Org
-        run: sf project deploy start
-      # Running tests to make sure nothing is broken
-      - name: Run unit tests
-        run: sf apex run test --wait 30 --test-level RunLocalTests --code-coverage
+
+      - name: Generate the package.xml for delta files
+        run: |
+          mkdir delta
+          sfdx sgd:source:delta --to "HEAD" --from "HEAD~1" --output "./delta" --ignore-whitespace -d -i .sgdignore
+          echo "--- package.xml generated with added and modified metadata ---"
+          cat delta/package/package.xml
+
+      - name: Deploy Delta components to Salesofrce
+        run: |
+          sfdx force:source:deploy -x delta/package/package.xml -c -l RunLocalTests -u DevHub
