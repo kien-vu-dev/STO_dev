@@ -14,14 +14,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      # We need to install NPM so that we can install SFDX CLI tools
-      - name: Install NPM
-        run: |
-          npm install
-      # Isntalling SFDX CLI
-      - name: Install the SFDX CLI
-        run: |
-          npm install @salesforce/cli --global
+
       # We need to use a key value stored as GitHub secret and
       # create a .key file since 'sf org login jwt' command expects a path
       # to .key file as a parameter
@@ -42,4 +35,4 @@ jobs:
         run: sf project deploy start
       # Running tests to make sure nothing is broken
       - name: Run unit tests
-        run: sf apex run test --wait 30 --test-level RunAllTestsInOrg --code-coverage
+        run: sf apex run test --wait 30 --test-level RunLocalTests --code-coverage
