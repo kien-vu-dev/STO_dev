@@ -18,12 +18,12 @@ jobs:
       # Isntalling SFDX CLI
       - name: Install the SFDX CLI
         run: |
-          npm install @salesforce/cli --global
-          sf force --help
+          npm install sfdx-cli --global
+          sfdx force --help
 
       - name: Install the sfdx-git-delta plugin
         run: |
-          echo 'y' | sf plugins:install sfdx-git-delta
+          echo 'y' | sfdx plugins:install sfdx-git-delta
 
       # We need to use a key value stored as GitHub secret and
       # create a .key file since 'sf org login jwt' command expects a path
@@ -35,7 +35,7 @@ jobs:
       # Authorization with DevHub. Notice that all critical values are
       # used from the GitHub secrets storage and aren't public
       - name: Authorize DevHub
-        run: sf auth:jwt:grant --json --alias DevHub
+        run: sfdx auth:jwt:grant --json --alias DevHub
           --set-default --set-default-dev-hub
           --username "${{ secrets.SF_CICD_USERNAME }}"
           --jwt-key-file server.key
@@ -44,10 +44,10 @@ jobs:
       - name: Generate the package.xml for delta files
         run: |
           mkdir delta
-          sf sgd:source:delta --to "HEAD" --from "HEAD~1" --output "./delta" --ignore-whitespace -d -i .sgdignore
+          sfdx sgd:source:delta --to "HEAD" --from "HEAD~1" --output "./delta" --ignore-whitespace -d -i .sgdignore
           echo "--- package.xml generated with added and modified metadata ---"
           cat delta/package/package.xml
 
       - name: Deploy Delta components to Salesofrce
         run: |
-          sf force:source:deploy -x delta/package/package.xml -c -l RunLocalTests -u DevHub
+          sfdx force:source:deploy -x delta/package/package.xml -c -l RunLocalTests -u DevHub
