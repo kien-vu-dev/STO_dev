@@ -4,7 +4,7 @@
     <caseSensitive>false</caseSensitive>
     <externalId>false</externalId>
     <label>Stripe Customer ID</label>
-    <length>50</length>
+    <length>15</length>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <type>Text</type>
