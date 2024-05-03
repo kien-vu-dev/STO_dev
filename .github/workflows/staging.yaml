@@ -35,7 +35,7 @@ jobs:
       # Authorization with DevHub. Notice that all critical values are
       # used from the GitHub secrets storage and aren't public
       - name: Authorize DevHub
-        run: sf org login jwt --json --alias DevHub
+        run: sfdx auth:jwt:grant --json --alias DevHub
           --set-default --set-default-dev-hub
           --username "${{ secrets.SF_CICD_USERNAME }}"
           --jwt-key-file server.key
